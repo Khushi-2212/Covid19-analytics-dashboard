@@ -18,35 +18,27 @@ import streamlit as st
 # Step 2: Load Dataset
 # -----------------------------
 @st.cache_data
-def load_data(local_path: str | None = None):
-    """Load OWID COVID dataset. If local_path provided, load that; else fetch from OWID URL."""
-    url = r"https://www.kaggle.com/datasets/caesarmario/our-world-in-data-covid19-dataset"
+def load_data():
+    # Hamesha relative path use karein deployment ke liye
+    file_path = "owid-covid-data.csv"
     try:
-        if local_path:
-            df = pd.read_csv(local_path)
-        else:
-            df = pd.read_csv(url, low_memory=False)
+        df = pd.read_csv(file_path, low_memory=False)
+        
+        # Columns select karne se pehle check karein ki wo exist karte hain
+        columns_needed = [
+            'location', 'date', 'total_cases', 'new_cases',
+            'total_deaths', 'new_deaths', 'continent',
+            'total_vaccinations', 'people_vaccinated', 'population'
+        ]
+        df = df[[c for c in columns_needed if c in df.columns]]
+        
+        df['date'] = pd.to_datetime(df['date'])
+        numeric_cols = df.select_dtypes(include=[np.number]).columns
+        df[numeric_cols] = df[numeric_cols].fillna(0)
+        return df
     except Exception as e:
-        # fallback: try local data folder
-        if local_path is None:
-            try:
-                df = pd.read_csv(r"C:\Users\Bhumi\Desktop\python project\owid-covid-data.csv", low_memory=False)
-            except Exception as e2:
-                raise RuntimeError("Could not load dataset from URL or data/ folder.") from e2
-        else:
-            raise
-    # keep only needed columns if they exist
-    columns_needed = [
-        'location', 'date', 'total_cases', 'new_cases',
-        'total_deaths', 'new_deaths',
-        'total_vaccinations', 'people_vaccinated', 'population'
-    ]
-    df = df[[c for c in columns_needed if c in df.columns]]
-    df['date'] = pd.to_datetime(df['date'])
-    numeric_cols = df.select_dtypes(include=[np.number]).columns
-    df[numeric_cols] = df[numeric_cols].fillna(0)
-    return df
-
+        st.error(f"Error: Dataset 'owid-covid-data.csv' nahi mila. Please check your GitHub files.")
+        return None
 
 df = load_data()
 
@@ -145,4 +137,5 @@ st.markdown(f"""
 
 # Export cleaned data option
 st.download_button("Download Cleaned Data (CSV)", df.to_csv(index=False), "Cleaned_COVID19_Data.csv", "text/csv")
+
 
