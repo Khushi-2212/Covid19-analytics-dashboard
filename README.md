@@ -3,8 +3,15 @@ An interactive data analytics dashboard built with Python and Streamlit to visua
 
 ### Features
 - Analyzed **300,000+ rows** of global data.
-- Interactive charts for cases, deaths, and vaccinations across **200+ countries**.
-- Optimized performance using Streamlit caching.
+- Static Insights:
+    1 - Top affected countries by total cases
+    2 - Global daily new cases trend
+- Interactive Dashboard:
+    1 - Country multi-select
+    2 - Date range filtering
+    3 - Vaccination progress visualization
+- Comparison Table: Latest statistics for selected countries
+- Export Option: Download cleaned dataset as CSV
 
 ### Tech Stack
 - **Language:** Python
